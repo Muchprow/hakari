@@ -2,7 +2,6 @@
 *.dll
 *.so
 *.dylib
-demo
 demo.exe
 .DS_Store
 Thumbs.db
