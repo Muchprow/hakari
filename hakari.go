@@ -50,3 +50,7 @@ func (a *App) Run() {
 	defer a.w.Destroy()
 	a.w.Run()
 }
+
+func (a *App) On(name string, handler any) {
+	a.w.Bind(name, handler)
+}

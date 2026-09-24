@@ -11,10 +11,34 @@
             color: #f0f0f0;
         }
         h1 { color: #ff6b9d; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        #result { margin-top: 20px; font-size: 18px; color: #ffd93d; }
     </style>
 </head>
 <body>
     <h1>Hello from Hakari!</h1>
     <p>If you see this, the framework is working.</p>
+
+    <button onclick="testGreet()">Greet</button>
+    <button onclick="testAdd()">Add 2 + 3</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function testGreet() {
+            const msg = await window.greet()
+            document.getElementById('result').textContent = msg
+        }
+
+        async function testAdd() {
+            const sum = await window.add(2, 3)
+            document.getElementById('result').textContent = '2 + 3 = ' + sum
+        }
+    </script>
 </body>
 </html>

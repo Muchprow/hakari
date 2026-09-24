@@ -29,3 +29,5 @@ func main() {
 	app.LoadHTMLFile("assets/index.html")
 	app.Run()
 }
+
+## With love from Ukraine💙💛
