@@ -4,6 +4,8 @@ Lightweight Go framework for building UI-centric desktop apps and games with HTM
 
 No CGo. No Node.js. One binary.
 
+## With love from Ukraine💙💛
+
 ## Status
 
 Early development.
@@ -29,5 +31,3 @@ func main() {
 	app.LoadHTMLFile("assets/index.html")
 	app.Run()
 }
-
-## With love from Ukraine💙💛
