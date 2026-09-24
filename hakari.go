@@ -1,6 +1,7 @@
 package hakari
 
 import (
+	"io/fs"
 	"os"
 
 	"github.com/abemedia/go-webview"
@@ -29,6 +30,15 @@ func New(title string) *App {
 
 func (a *App) LoadHTMLFile(path string) error {
 	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	a.w.SetHtml(string(data))
+	return nil
+}
+
+func (a *App) LoadHTMLFromFS(fsys fs.FS, path string) error {
+	data, err := fs.ReadFile(fsys, path)
 	if err != nil {
 		return err
 	}
