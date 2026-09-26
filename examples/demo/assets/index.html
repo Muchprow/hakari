@@ -3,42 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Hakari Demo</title>
-    <style>
-        body {
-            font-family: system-ui, sans-serif;
-            margin: 40px;
-            background: #1a1a1a;
-            color: #f0f0f0;
-        }
-        h1 { color: #ff6b9d; }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin: 5px;
-            cursor: pointer;
-        }
-        #result { margin-top: 20px; font-size: 18px; color: #ffd93d; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Hello from Hakari!</h1>
-    <p>If you see this, the framework is working.</p>
 
-    <button onclick="testGreet()">Greet</button>
-    <button onclick="testAdd()">Add 2 + 3</button>
+    <div class="panel">
+        <div class="row">Player: <span class="value" id="name">—</span></div>
+        <div class="row">HP: <span class="value" id="hp">—</span></div>
+        <div class="row">Level: <span class="value" id="level">—</span></div>
+    </div>
 
-    <div id="result"></div>
+    <button onclick="attack()">Take 10 damage</button>
+    <button onclick="up()">Level up</button>
 
-    <script>
-        async function testGreet() {
-            const msg = await window.greet()
-            document.getElementById('result').textContent = msg
-        }
-
-        async function testAdd() {
-            const sum = await window.add(2, 3)
-            document.getElementById('result').textContent = '2 + 3 = ' + sum
-        }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
