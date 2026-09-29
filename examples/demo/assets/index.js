@@ -1,0 +1,1 @@
+window.renderScreens = function () {}

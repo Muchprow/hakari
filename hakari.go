@@ -13,13 +13,15 @@ import (
 )
 
 type App struct {
-	title  string
-	width  int
-	height int
-	w      webview.WebView
-	data   map[string]any
-	fsys   fs.FS
-	root   string
+	title   string
+	width   int
+	height  int
+	w       webview.WebView
+	data    map[string]any
+	fsys    fs.FS
+	root    string
+	screens map[string]*Screen
+	current string
 }
 
 func New(title string) *App {
@@ -28,11 +30,12 @@ func New(title string) *App {
 	w.SetSize(1024, 768, webview.HintNone)
 
 	return &App{
-		title:  title,
-		width:  1024,
-		height: 768,
-		w:      w,
-		data:   make(map[string]any),
+		title:   title,
+		width:   1024,
+		height:  768,
+		w:       w,
+		data:    make(map[string]any),
+		screens: make(map[string]*Screen),
 	}
 }
 
@@ -108,7 +111,7 @@ func (a *App) Set(key string, value any) {
 		return
 	}
 
-	js := fmt.Sprintf("window.hakari = window.hakari || {}; window.hakari.%s = %s;", key, string(jsonValue))
+	js := fmt.Sprintf("window.hakari = window.hakari || {}; window.hakari[%q] = %s;", key, string(jsonValue))
 	a.w.Dispatch(func() {
 		a.w.Eval(js)
 	})
@@ -116,6 +119,97 @@ func (a *App) Set(key string, value any) {
 
 func (a *App) Get(key string) any {
 	return a.data[key]
+}
+
+func (a *App) Screen(name string, fn func(s *Screen)) {
+	s := &Screen{
+		app:  a,
+		name: name,
+	}
+	fn(s)
+	a.screens[name] = s
+}
+
+func (a *App) Start(name string) {
+	if _, ok := a.screens[name]; !ok {
+		panic(fmt.Sprintf("hakari: screen %q not found", name))
+	}
+
+	a.GoTo(name)
+
+	a.w.Run()
+}
+
+func (a *App) GoTo(name string) {
+	a.GoToWith(name, nil)
+}
+
+func (a *App) GoToWith(name string, args map[string]any) {
+	target, ok := a.screens[name]
+	if !ok {
+		return
+	}
+
+	if a.current != "" {
+		if cur, ok := a.screens[a.current]; ok {
+			for _, fn := range cur.onLeave {
+				fn()
+			}
+			a.w.Dispatch(func() {
+				a.w.Eval(fmt.Sprintf(
+					`(function(){var el=document.getElementById('hakari-screen-%s');if(el)el.style.display='none';})()`,
+					a.current,
+				))
+			})
+		}
+	}
+
+	html, err := target.render()
+	if err != nil {
+		fmt.Printf("hakari: render screen %q: %v\n", name, err)
+		return
+	}
+
+	htmlJSON, _ := json.Marshal(html)
+	argsJSON := target.marshalArgs(args)
+
+	script := fmt.Sprintf(`(function(){
+var existing = document.getElementById('hakari-screen-%s');
+var container = document.getElementById('hakari-screen-container');
+if (!container) {
+    container = document.createElement('div');
+    container.id = 'hakari-screen-container';
+    document.body.appendChild(container);
+}
+if (existing) {
+    existing.style.display = 'block';
+} else {
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = %s;
+    var screenEl = wrapper.firstElementChild;
+    container.appendChild(screenEl);
+
+    var scripts = screenEl.querySelectorAll('script');
+    for (var i = 0; i < scripts.length; i++) {
+        var oldScript = scripts[i];
+        var newScript = document.createElement('script');
+        newScript.textContent = oldScript.textContent;
+        document.head.appendChild(newScript);
+        oldScript.parentNode.removeChild(oldScript);
+    }
+}
+window.hakariArgs = %s;
+})()`, name, string(htmlJSON), argsJSON)
+
+	a.w.Dispatch(func() {
+		a.w.Eval(script)
+	})
+
+	for _, fn := range target.onEnter {
+		fn()
+	}
+
+	a.current = name
 }
 
 func (a *App) Run() {
