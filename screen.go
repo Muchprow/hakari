@@ -50,6 +50,22 @@ func (s *Screen) OnLeave(fn func()) {
 	s.onLeave = append(s.onLeave, fn)
 }
 
+func (s *Screen) Save(slot string, data any) error {
+	return s.app.Save(slot, data)
+}
+
+func (s *Screen) Load(slot string, data any) error {
+	return s.app.Load(slot, data)
+}
+
+func (s *Screen) SaveExists(slot string) bool {
+	return s.app.SaveExists(slot)
+}
+
+func (s *Screen) Delete(slot string) error {
+	return s.app.Delete(slot)
+}
+
 var (
 	cssLinkRe2 = regexp.MustCompile(`<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>`)
 	jsSrcRe2   = regexp.MustCompile(`<script[^>]*src="([^"]+)"[^>]*></script>`)
