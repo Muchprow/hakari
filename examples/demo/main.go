@@ -64,6 +64,10 @@ func main() {
 			return level
 		})
 
+		s.On("pickFile", func() {
+			s.OpenFile()
+		})
+
 		s.On("back", func() {
 			s.GoTo("menu")
 		})

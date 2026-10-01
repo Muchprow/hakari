@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -22,6 +23,7 @@ type App struct {
 	root    string
 	screens map[string]*Screen
 	current string
+	assets  *assetServer
 }
 
 func New(title string) *App {
@@ -29,7 +31,7 @@ func New(title string) *App {
 	w.SetTitle(title)
 	w.SetSize(1024, 768, webview.HintNone)
 
-	return &App{
+	app := &App{
 		title:   title,
 		width:   1024,
 		height:  768,
@@ -37,6 +39,32 @@ func New(title string) *App {
 		data:    make(map[string]any),
 		screens: make(map[string]*Screen),
 	}
+
+	app.setupDialogBridge()
+
+	return app
+}
+
+func (a *App) ensureAssetServer() {
+	if a.assets != nil {
+		return
+	}
+
+	dir, err := a.SaveDir()
+	if err != nil {
+		fmt.Printf("hakari: save dir failed: %v\n", err)
+		return
+	}
+
+	cacheDir := filepath.Join(dir, "cache")
+
+	server, err := newAssetServer(cacheDir)
+	if err != nil {
+		fmt.Printf("hakari: asset server failed: %v\n", err)
+		return
+	}
+
+	a.assets = server
 }
 
 func (a *App) LoadHTMLFile(path string) error {
@@ -135,6 +163,8 @@ func (a *App) Start(name string) {
 		panic(fmt.Sprintf("hakari: screen %q not found", name))
 	}
 
+	a.ensureAssetServer()
+
 	a.GoTo(name)
 
 	a.w.Run()
@@ -214,5 +244,10 @@ window.hakariArgs = %s;
 
 func (a *App) Run() {
 	defer a.w.Destroy()
+	defer func() {
+		if a.assets != nil {
+			a.assets.Stop()
+		}
+	}()
 	a.w.Run()
 }
