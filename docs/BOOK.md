@@ -54,7 +54,7 @@ The name **Hakari** comes from a character in *Jujutsu Kaisen* who throws jackpo
 
 ### About Me
 
-My name is **Mykhailo** (Michael). I'm from **Ukraine** 🇺🇦, and I'm **15 years old**. I write in **C, C++, C#, Go, and Python** — I don't lock myself into one language; I pick whatever fits the task.
+My name is **Mykhailo** (Michael). I'm from **Ukraine** 🇺🇦, and I'm **15 years old**. I write in **C, C++, C#, Go, Java and Python** — I don't lock myself into one language; I pick whatever fits the task.
 
 I'm a **Java enjoyer**. That might sound strange for a Go project — but Go caught my attention for the same reasons I love Java: **native compilation for any platform**, **even resource distribution**, and **predictable performance**. Go takes the best of Java's philosophy and pushes it further.
 
