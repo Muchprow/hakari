@@ -185,12 +185,6 @@ func (a *App) GoToWith(name string, args map[string]any) {
 			for _, fn := range cur.onLeave {
 				fn()
 			}
-			a.w.Dispatch(func() {
-				a.w.Eval(fmt.Sprintf(
-					`(function(){var el=document.getElementById('hakari-screen-%s');if(el)el.style.display='none';})()`,
-					a.current,
-				))
-			})
 		}
 	}
 
@@ -204,19 +198,26 @@ func (a *App) GoToWith(name string, args map[string]any) {
 	argsJSON := target.marshalArgs(args)
 
 	script := fmt.Sprintf(`(function(){
-var existing = document.getElementById('hakari-screen-%s');
 var container = document.getElementById('hakari-screen-container');
 if (!container) {
     container = document.createElement('div');
     container.id = 'hakari-screen-container';
     document.body.appendChild(container);
 }
+
+var allScreens = container.querySelectorAll('.hakari-screen');
+for (var j = 0; j < allScreens.length; j++) {
+    allScreens[j].style.display = 'none';
+}
+
+var existing = document.getElementById('hakari-screen-%s');
 if (existing) {
     existing.style.display = 'block';
 } else {
     var wrapper = document.createElement('div');
     wrapper.innerHTML = %s;
     var screenEl = wrapper.firstElementChild;
+    screenEl.style.display = 'block';
     container.appendChild(screenEl);
 
     var scripts = screenEl.querySelectorAll('script');
