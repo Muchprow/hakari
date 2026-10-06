@@ -103,10 +103,13 @@ func (a *App) inlineAssets(html string) string {
 		}
 		href := sub[1]
 		path := a.root + "/" + strings.TrimPrefix(href, "./")
+		fmt.Printf("hakari: trying to read CSS: %s\n", path)
 		data, err := fs.ReadFile(a.fsys, path)
 		if err != nil {
+			fmt.Printf("hakari: CSS read error: %v\n", err)
 			return match
 		}
+		fmt.Printf("hakari: CSS loaded, size: %d\n", len(data))
 		return "<style>\n" + string(data) + "\n</style>"
 	})
 
@@ -119,8 +122,10 @@ func (a *App) inlineAssets(html string) string {
 		path := a.root + "/" + strings.TrimPrefix(src, "./")
 		data, err := fs.ReadFile(a.fsys, path)
 		if err != nil {
+			fmt.Printf("hakari: JS read error: %v\n", err)
 			return match
 		}
+		fmt.Printf("hakari: JS loaded, size: %d\n", len(data))
 		return "<script>\n" + string(data) + "\n</script>"
 	})
 
